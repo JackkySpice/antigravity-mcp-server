@@ -130,8 +130,8 @@ export const resetAgentStateTool = {
   },
 };
 
-// State file paths
-const STATE_DIR = join(homedir(), ".antigravity");
+// State file paths - matches AntiGravity's ~/.gemini/antigravity/ structure
+const STATE_DIR = join(homedir(), ".gemini", "antigravity");
 const STATE_FILE = join(STATE_DIR, "state.json");
 const ARTIFACTS_FILE = join(STATE_DIR, "artifacts.json");
 const REVIEWS_FILE = join(STATE_DIR, "reviews.json");

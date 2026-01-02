@@ -60,8 +60,8 @@ export const notifyUserTool = {
   },
 };
 
-// Notifications file path
-const NOTIFICATIONS_DIR = join(homedir(), ".antigravity");
+// Notifications file path - matches AntiGravity's ~/.gemini/antigravity/ structure
+const NOTIFICATIONS_DIR = join(homedir(), ".gemini", "antigravity");
 const NOTIFICATIONS_FILE = join(NOTIFICATIONS_DIR, "notifications.json");
 
 async function ensureNotificationsDir(): Promise<void> {

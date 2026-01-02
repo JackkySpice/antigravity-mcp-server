@@ -59,8 +59,8 @@ export const taskBoundaryTool = {
   },
 };
 
-// State file path
-const STATE_DIR = join(homedir(), ".antigravity");
+// State file path - matches AntiGravity's ~/.gemini/antigravity/ structure
+const STATE_DIR = join(homedir(), ".gemini", "antigravity");
 const STATE_FILE = join(STATE_DIR, "state.json");
 
 async function ensureStateDir(): Promise<void> {

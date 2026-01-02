@@ -25,14 +25,14 @@ interface ArtifactsManifest {
   artifacts: Record<string, ArtifactMetadata>;
 }
 
-// Utility functions
+// Utility functions - matches AntiGravity's ~/.gemini/antigravity/brain/{uuid}/ structure
 function getProjectHash(projectPath: string): string {
   return crypto.createHash("sha256").update(projectPath).digest("hex").slice(0, 12);
 }
 
 function getBrainDir(projectPath: string): string {
   const projectHash = getProjectHash(projectPath);
-  return path.join(os.homedir(), ".antigravity", "brain", projectHash);
+  return path.join(os.homedir(), ".gemini", "antigravity", "brain", projectHash);
 }
 
 function getArtifactPath(brainDir: string, type: ArtifactType): string {

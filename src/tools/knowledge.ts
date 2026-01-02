@@ -134,11 +134,10 @@ export const searchKnowledgeTool = {
   },
 };
 
-// ============================================================================
-// Storage Helpers
+// Storage Helpers - matches AntiGravity's ~/.gemini/antigravity/ structure
 // ============================================================================
 
-const KNOWLEDGE_DIR = join(homedir(), ".antigravity", "knowledge");
+const KNOWLEDGE_DIR = join(homedir(), ".gemini", "antigravity", "knowledge");
 const INDEX_FILE = join(KNOWLEDGE_DIR, "index.json");
 
 async function ensureKnowledgeDir(): Promise<void> {
