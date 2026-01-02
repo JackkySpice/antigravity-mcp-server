@@ -11,6 +11,8 @@ type ArtifactType = "implementation_plan" | "task" | "walkthrough" | "other";
 interface ArtifactMetadata {
   type: ArtifactType;
   summary?: string;
+  complexity?: number;
+  isArtifact: boolean;
   createdAt: string;
   updatedAt: string;
   versions: Array<{
@@ -93,12 +95,16 @@ const createArtifactSchema = {
   type: z.enum(["implementation_plan", "task", "walkthrough", "other"]).describe("Artifact type"),
   content: z.string().describe("The artifact content (markdown)"),
   summary: z.string().optional().describe("Brief description of the artifact"),
+  complexity: z.number().min(1).max(10).optional().describe("Complexity rating 1-10 for review importance"),
+  isArtifact: z.boolean().optional().default(true).describe("Whether this is a user-facing artifact"),
+  overwrite: z.boolean().optional().default(false).describe("Set true to overwrite existing artifact"),
   projectPath: z.string().optional().describe("Project directory path (defaults to cwd)"),
 };
 
 const updateArtifactSchema = {
   type: z.enum(["implementation_plan", "task", "walkthrough", "other"]).describe("Which artifact to update"),
   content: z.string().describe("New content for the artifact"),
+  complexity: z.number().min(1).max(10).optional().describe("Updated complexity rating"),
   projectPath: z.string().optional().describe("Project directory path (defaults to cwd)"),
 };
 
@@ -107,6 +113,9 @@ async function handleCreateArtifact(args: {
   type: ArtifactType;
   content: string;
   summary?: string;
+  complexity?: number;
+  isArtifact?: boolean;
+  overwrite?: boolean;
   projectPath?: string;
 }): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   const projectPath = args.projectPath || process.cwd();
@@ -122,12 +131,12 @@ async function handleCreateArtifact(args: {
 
   // Check if artifact already exists
   const existingArtifact = manifest.artifacts[args.type];
-  if (existingArtifact) {
+  if (existingArtifact && !args.overwrite) {
     return {
       content: [
         {
           type: "text",
-          text: `Artifact "${args.type}" already exists. Use update_artifact to modify it.\nPath: ${artifactPath}`,
+          text: `Artifact "${args.type}" already exists. Use update_artifact to modify it, or set overwrite=true.\nPath: ${artifactPath}`,
         },
       ],
     };
@@ -140,14 +149,13 @@ async function handleCreateArtifact(args: {
   manifest.artifacts[args.type] = {
     type: args.type,
     summary: args.summary,
-    createdAt: now,
+    complexity: args.complexity,
+    isArtifact: args.isArtifact ?? true,
+    createdAt: existingArtifact?.createdAt ?? now,
     updatedAt: now,
-    versions: [
-      {
-        timestamp: now,
-        hash: contentHash,
-      },
-    ],
+    versions: existingArtifact?.versions
+      ? [...existingArtifact.versions, { timestamp: now, hash: contentHash }]
+      : [{ timestamp: now, hash: contentHash }],
   };
 
   await saveManifest(brainDir, manifest);
@@ -157,10 +165,12 @@ async function handleCreateArtifact(args: {
       {
         type: "text",
         text: [
-          `Created artifact: ${args.type}`,
+          `${args.overwrite && existingArtifact ? "Overwrote" : "Created"} artifact: ${args.type}`,
           `Path: ${artifactPath}`,
           `Hash: ${contentHash}`,
           args.summary ? `Summary: ${args.summary}` : null,
+          args.complexity ? `Complexity: ${args.complexity}/10` : null,
+          `IsArtifact: ${args.isArtifact ?? true}`,
           `Project hash: ${getProjectHash(projectPath)}`,
         ]
           .filter(Boolean)

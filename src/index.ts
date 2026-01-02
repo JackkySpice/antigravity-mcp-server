@@ -47,6 +47,20 @@ const createArtifactTool = {
         type: "string",
         description: "Brief description of the artifact",
       },
+      complexity: {
+        type: "number",
+        minimum: 1,
+        maximum: 10,
+        description: "Complexity rating 1-10 for review importance",
+      },
+      isArtifact: {
+        type: "boolean",
+        description: "Whether this is a user-facing artifact (default: true)",
+      },
+      overwrite: {
+        type: "boolean",
+        description: "Set true to overwrite existing artifact (default: false)",
+      },
       projectPath: {
         type: "string",
         description: "Project directory path (defaults to cwd)",
@@ -70,6 +84,12 @@ const updateArtifactTool = {
       content: {
         type: "string",
         description: "New content for the artifact",
+      },
+      complexity: {
+        type: "number",
+        minimum: 1,
+        maximum: 10,
+        description: "Updated complexity rating",
       },
       projectPath: {
         type: "string",
